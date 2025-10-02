@@ -30,19 +30,19 @@ VALIDATE() {
 }
 
 ################# NodeJS related steps #####################
-dnf module disable nodejs -y 
+dnf module disable nodejs -y &>>$LOG_FILE
 VALIDATE $? "disabling nodejs module"
 
-dnf enable nodejs:20 -y
+dnf enable nodejs:20 -y &>>$LOG_FILE
 VALIDATE $? "enabling nodejs 20 module"
 
-dnf install nodejs -y
+dnf install nodejs -y &>>$LOG_FILE
 VALIDATE $? "installing nodejs"
 
-useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop  &>>$LOG_FILE
 VALIDATE $? "adding roboshop user"
 
-mkdir -p /app
+mkdir -p /app  &>>$LOG_FILE
 VALIDATE $? "creating application directory"
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
@@ -54,7 +54,7 @@ VALIDATE $? "changing directory to /app"
 unzip /tmp/catalogue.zip
 VALIDATE $? "extracting catalogue application code"
 
-npm install
+npm install &>>$LOG_FILE
 VALIDATE $? "installing nodejs dependencies"
 
 cp catalogue.service /etc/systemd/system/catalogue.service
@@ -77,3 +77,7 @@ dnf install mongodb-mongosh -y
 VALIDATE $? "installing mongoDB shell"
 
 mongosh --host $mongodb_host </app/db/master-data.js
+VALIDATE $? "loading catalogue schema"
+
+systemctl restart catalogue
+VALIDATE $? "restarting catalogue service"
