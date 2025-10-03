@@ -46,16 +46,15 @@ fi
 VALIDATE $? "adding roboshop user"
 
 mkdir  /app  &>>$LOG_FILE
+if [ $? -ne 0 ]; then
+  echo -e "${y}Directory /app already exists, skipping directory creation${n}"
+fi
 VALIDATE $? "creating application directory"
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
 VALIDATE $? "downloading catalogue application code"
 
 cd /app
-if [ $? -ne 0 ]; then
-  echo -e "${r} Directory /app does not exists, please check the log file for more information: $LOG_FILE${n}"
-  exit 1
-fi
 VALIDATE $? "changing directory to /app"
 
 unzip /tmp/catalogue.zip
