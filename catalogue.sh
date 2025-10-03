@@ -39,8 +39,11 @@ VALIDATE $? "enabling nodejs 20 module"
 dnf install nodejs -y &>>$LOG_FILE
 VALIDATE $? "installing nodejs"
 
-#useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop  &>>$LOG_FILE
-#VALIDATE $? "adding roboshop user"
+useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop  &>>$LOG_FILE
+if [ $? -ne 0 ]; then
+  echo -e "${y}User roboshop already exists, skipping user creation${n}"
+fi
+VALIDATE $? "adding roboshop user"
 
 mkdir  /app  &>>$LOG_FILE
 VALIDATE $? "creating application directory"
@@ -49,6 +52,10 @@ curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue
 VALIDATE $? "downloading catalogue application code"
 
 cd /app
+if [ $? -ne 0 ]; then
+  echo -e "${r} Directory /app does not exists, please check the log file for more information: $LOG_FILE${n}"
+  exit 1
+fi
 VALIDATE $? "changing directory to /app"
 
 unzip /tmp/catalogue.zip
